@@ -1,50 +1,567 @@
-import tkinter as tk
-from tkinter import messagebox
 import os
+from datetime import datetime
+from tkinter import messagebox
+import customtkinter as ctk
+
+
+# ============================================================
+# CONFIGURAÇÕES
+# ============================================================
+
+ctk.set_appearance_mode("dark")
+
+
+# ============================================================
+# CORES
+# ============================================================
+
+FUNDO = "#0B0D12"
+PAINEL = "#12151C"
+PAINEL_2 = "#181C25"
+BORDA = "#292F3B"
+
+BRANCO = "#F5F7FA"
+CINZA = "#8B93A5"
+CINZA_2 = "#667085"
+
+AZUL = "#5865F2"
+AZUL_HOVER = "#4752C4"
+
+VERMELHO = "#E63946"
+VERMELHO_HOVER = "#C92F3B"
+
+LARANJA = "#F59E0B"
+LARANJA_HOVER = "#D97706"
+
+VERDE = "#22C55E"
+VERDE_HOVER = "#16A34A"
+
+BOTAO = "#202530"
+BOTAO_HOVER = "#2A3040"
+
+
+# ============================================================
+# FUNÇÕES DO PROGRAMA
+# ============================================================
 
 def desligar_pc_M(minutos):
     segundos = int(minutos * 60)
-    os.system(f"shutdown /s /t {segundos}")
+    os.system(f"shutdown /s /f /t {segundos}")
+
     if minutos > 0:
-        messagebox.showinfo("Aviso", f"O PC vai desligar em {minutos} minutos!")
+        messagebox.showinfo(
+            "Aviso",
+            f"O PC vai desligar em {minutos} minutos!"
+        )
+
 
 def desligar_pc_H(horas):
     segundos = int(horas * 3600)
-    os.system(f"shutdown /s /t {segundos}")
+    os.system(f"shutdown /s /f /t {segundos}")
+
     if horas > 0:
-        messagebox.showinfo("Aviso", f"O PC vai desligar em {horas} horas!")
+        messagebox.showinfo(
+            "Aviso",
+            f"O PC vai desligar em {horas} horas!"
+        )
+
 
 def reiniciar():
-    os.system("shutdown /r")
+    os.system("shutdown /r /f /t 0")
+
 
 def cancelar():
     os.system("shutdown /a")
-    messagebox.showinfo("Aviso", "Desligamento cancelado")
 
-janela = tk.Tk()
-janela.title("Sitema OS")
-janela.geometry("500x600")
-tk.Label(janela, text="Funções comuns", font=("Arial", 20)).pack(pady=5)
-tk.Button(janela, text="Desligar agora", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(0)).pack(pady=5)
-tk.Button(janela, text="Reiniciar agora", width="30", font=("Arial", 16), command=reiniciar).pack(pady=5)
+    messagebox.showinfo(
+        "Aviso",
+        "Desligamento cancelado com sucesso! 👍"
+    )
 
-tk.Label(janela, text="Cronometro por minutos", font=("Arial", 20)).pack(pady=5)
-tk.Button(janela, text="Desligar 10 minutos", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(10)).pack(pady=5)
-tk.Button(janela, text="Desligar 20 minutos", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(20)).pack(pady=5)
-tk.Button(janela, text="Desligar 30 minutos", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(30)).pack(pady=5)
-tk.Button(janela, text="Desligar 40 minutos", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(40)).pack(pady=5)
-tk.Button(janela, text="Desligar 50 minutos", width="30", font=("Arial", 16), command=lambda: desligar_pc_M(50)).pack(pady=5)
 
-tk.Label(janela, text="Cronometro por horas", font=("Arial", 20)).pack(pady=5)
-tk.Button(janela, text="Desligar 1 hora", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(1)).pack(pady=5)
-tk.Button(janela, text="Desligar 1 h e 30 min", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(1.5)).pack(pady=5)
-tk.Button(janela, text="Desligar 2 horas", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(2)).pack(pady=5)
-tk.Button(janela, text="Desligar 2 h e 30 min", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(2.5)).pack(pady=5)
-tk.Button(janela, text="Desligar 3 horas", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(3)).pack(pady=5)
-tk.Button(janela, text="Desligar 3 h e 30 min", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(3.5)).pack(pady=5)
-tk.Button(janela, text="Desligar 4 horas", width="30", font=("Arial", 16), command=lambda: desligar_pc_H(4)).pack(pady=5)
+def agendar_desligamento():
+    horario_texto = entrada_horario.get().strip()
 
-tk.Label(janela, text="Cancelar qualquer tempo", font=("Arial", 20)).pack(pady=5)
-tk.Button(janela, text="Cancelar tudo", width="30", font=("Arial", 16), command=lambda: cancelar()).pack(pady=5)
+    if not horario_texto:
+        messagebox.showwarning(
+            "Sem Horário",
+            "Nenhum horário foi informado. Digite uma hora para agendar! 😊",
+        )
+        return
+
+    try:
+        agora = datetime.now()
+
+        horario_alvo = datetime.strptime(
+            f"{agora.strftime('%Y-%m-%d')} {horario_texto}",
+            "%Y-%m-%d %H:%M"
+        )
+
+        segundos = int(
+            (horario_alvo - agora).total_seconds()
+        )
+
+        if segundos <= 0:
+            messagebox.showerror(
+                "Horário Ultrapassado",
+                "Esse horário já passou hoje! Escolha um horário futuro. 😅",
+            )
+            return
+
+        os.system(
+            f"shutdown /s /f /t {segundos}"
+        )
+
+        messagebox.showinfo(
+            "Tudo Pronto!",
+            f"Agendado com sucesso! Seu PC desligará às {horario_texto}. 🚀",
+        )
+
+    except ValueError:
+        messagebox.showerror(
+            "Formato Inválido",
+            "Por favor, use o formato de hora correto (Ex: 23:30).",
+        )
+
+
+# ============================================================
+# JANELA
+# ============================================================
+
+janela = ctk.CTk()
+
+janela.title("Sistema OS")
+janela.geometry("420x820")
+janela.resizable(False, False)
+janela.configure(fg_color=FUNDO)
+
+
+# ============================================================
+# FONTES
+# ============================================================
+
+FONTE_TITULO = ctk.CTkFont(
+    family="Segoe UI",
+    size=18,
+    weight="bold"
+)
+
+FONTE_SUBTITULO = ctk.CTkFont(
+    family="Segoe UI",
+    size=9
+)
+
+FONTE_SECAO = ctk.CTkFont(
+    family="Segoe UI",
+    size=10,
+    weight="bold"
+)
+
+FONTE_BOTAO = ctk.CTkFont(
+    family="Segoe UI",
+    size=9,
+    weight="bold"
+)
+
+FONTE_PEQUENA = ctk.CTkFont(
+    family="Segoe UI",
+    size=8
+)
+
+
+# ============================================================
+# CABEÇALHO
+# ============================================================
+
+cabecalho = ctk.CTkFrame(
+    janela,
+    fg_color=PAINEL,
+    corner_radius=0,
+    height=72
+)
+
+cabecalho.pack(fill="x")
+cabecalho.pack_propagate(False)
+
+
+barra = ctk.CTkFrame(
+    cabecalho,
+    width=5,
+    fg_color=AZUL,
+    corner_radius=0
+)
+
+barra.pack(
+    side="left",
+    fill="y"
+)
+
+
+texto_cabecalho = ctk.CTkFrame(
+    cabecalho,
+    fg_color="transparent"
+)
+
+texto_cabecalho.pack(
+    side="left",
+    padx=16
+)
+
+
+ctk.CTkLabel(
+    texto_cabecalho,
+    text="SISTEMA OS",
+    font=FONTE_TITULO,
+    text_color=BRANCO
+).pack(anchor="w")
+
+
+ctk.CTkLabel(
+    texto_cabecalho,
+    text="Controle de energia do computador",
+    font=FONTE_SUBTITULO,
+    text_color=CINZA
+).pack(anchor="w")
+
+
+# ============================================================
+# ÁREA PRINCIPAL
+# ============================================================
+
+principal = ctk.CTkFrame(
+    janela,
+    fg_color=FUNDO
+)
+
+principal.pack(
+    fill="both",
+    expand=True,
+    padx=12,
+    pady=6
+)
+
+
+# ============================================================
+# TÍTULOS
+# ============================================================
+
+def titulo_secao(parent, texto):
+
+    frame = ctk.CTkFrame(
+        parent,
+        fg_color="transparent",
+        height=17
+    )
+
+    frame.pack(
+        fill="x",
+        pady=(2, 1)
+    )
+
+    frame.pack_propagate(False)
+
+    ctk.CTkLabel(
+        frame,
+        text=texto,
+        font=FONTE_SECAO,
+        text_color=BRANCO
+    ).pack(
+        side="left"
+    )
+
+    ctk.CTkFrame(
+        frame,
+        fg_color=BORDA,
+        height=1
+    ).pack(
+        side="left",
+        fill="x",
+        expand=True,
+        padx=(7, 0)
+    )
+
+
+# ============================================================
+# BOTÕES
+# ============================================================
+
+def botao(
+    parent,
+    texto,
+    comando,
+    cor=BOTAO,
+    hover=BOTAO_HOVER
+):
+
+    return ctk.CTkButton(
+        parent,
+        text=texto,
+        command=comando,
+        height=27,
+        corner_radius=6,
+        fg_color=cor,
+        hover_color=hover,
+        border_width=1,
+        border_color=BORDA,
+        font=FONTE_BOTAO,
+        text_color=BRANCO,
+        cursor="hand2"
+    )
+
+
+# ============================================================
+# FUNÇÕES COMUNS
+# ============================================================
+
+titulo_secao(
+    principal,
+    "⚡  FUNÇÕES COMUNS"
+)
+
+frame_comuns = ctk.CTkFrame(
+    principal,
+    fg_color=PAINEL,
+    corner_radius=8,
+    border_width=1,
+    border_color=BORDA
+)
+
+frame_comuns.pack(
+    fill="x",
+    pady=(0, 3)
+)
+
+
+botao(
+    frame_comuns,
+    "DESLIGAR AGORA",
+    lambda: desligar_pc_M(0),
+    VERMELHO,
+    VERMELHO_HOVER
+).pack(
+    fill="x",
+    padx=6,
+    pady=(5, 2)
+)
+
+
+botao(
+    frame_comuns,
+    "REINICIAR AGORA",
+    reiniciar,
+    LARANJA,
+    LARANJA_HOVER
+).pack(
+    fill="x",
+    padx=6,
+    pady=(2, 5)
+)
+
+
+# ============================================================
+# MINUTOS
+# ============================================================
+
+titulo_secao(
+    principal,
+    "⏱  DESLIGAMENTO POR MINUTOS"
+)
+
+frame_minutos = ctk.CTkFrame(
+    principal,
+    fg_color=PAINEL,
+    corner_radius=8,
+    border_width=1,
+    border_color=BORDA
+)
+
+frame_minutos.pack(
+    fill="x",
+    pady=(0, 3)
+)
+
+
+for texto, minutos in [
+    ("Desligar 10 Minutos", 10),
+    ("Desligar 20 Minutos", 20),
+    ("Desligar 30 Minutos", 30),
+    ("Desligar 40 Minutos", 40),
+    ("Desligar 50 Minutos", 50)
+]:
+
+    botao(
+        frame_minutos,
+        texto,
+        lambda m=minutos: desligar_pc_M(m)
+    ).pack(
+        fill="x",
+        padx=6,
+        pady=2
+    )
+
+
+# ============================================================
+# HORAS
+# ============================================================
+
+titulo_secao(
+    principal,
+    "🕒  DESLIGAMENTO POR HORAS"
+)
+
+frame_horas = ctk.CTkFrame(
+    principal,
+    fg_color=PAINEL,
+    corner_radius=8,
+    border_width=1,
+    border_color=BORDA
+)
+
+frame_horas.pack(
+    fill="x",
+    pady=(0, 3)
+)
+
+
+for texto, horas in [
+    ("Desligar 1 Hora", 1),
+    ("Desligar 1 h e 30 min", 1.5),
+    ("Desligar 2 Horas", 2),
+    ("Desligar 2 h e 30 min", 2.5),
+    ("Desligar 3 Horas", 3),
+    ("Desligar 3 h e 30 min", 3.5),
+    ("Desligar 4 Horas", 4)
+]:
+
+    botao(
+        frame_horas,
+        texto,
+        lambda h=horas: desligar_pc_H(h)
+    ).pack(
+        fill="x",
+        padx=6,
+        pady=2
+    )
+
+
+# ============================================================
+# HORÁRIO EXATO
+# ============================================================
+
+titulo_secao(
+    principal,
+    "🎯  HORÁRIO EXATO"
+)
+
+frame_horario = ctk.CTkFrame(
+    principal,
+    fg_color=PAINEL,
+    corner_radius=8,
+    border_width=1,
+    border_color=BORDA
+)
+
+frame_horario.pack(
+    fill="x",
+    pady=(0, 3)
+)
+
+
+linha_horario = ctk.CTkFrame(
+    frame_horario,
+    fg_color="transparent"
+)
+
+linha_horario.pack(
+    fill="x",
+    padx=6,
+    pady=6
+)
+
+
+ctk.CTkLabel(
+    linha_horario,
+    text="Horário:",
+    font=FONTE_BOTAO,
+    text_color=CINZA
+).pack(
+    side="left",
+    padx=(2, 6)
+)
+
+
+entrada_horario = ctk.CTkEntry(
+    linha_horario,
+    placeholder_text="23:30",
+    height=27,
+    width=90,
+    corner_radius=6,
+    border_width=1,
+    border_color=BORDA,
+    fg_color=PAINEL_2,
+    text_color=BRANCO,
+    placeholder_text_color=CINZA_2,
+    justify="center",
+    font=FONTE_BOTAO
+)
+
+entrada_horario.pack(
+    side="left"
+)
+
+
+botao(
+    linha_horario,
+    "AGENDAR DESLIGAMENTO",
+    agendar_desligamento,
+    AZUL,
+    AZUL_HOVER
+).pack(
+    side="left",
+    fill="x",
+    expand=True,
+    padx=(6, 0)
+)
+
+
+# ============================================================
+# SEGURANÇA
+# ============================================================
+
+titulo_secao(
+    principal,
+    "🛡  SEGURANÇA"
+)
+
+
+botao(
+    principal,
+    "CANCELAR DESLIGAMENTO",
+    cancelar,
+    VERDE,
+    VERDE_HOVER
+).pack(
+    fill="x",
+    pady=(0, 3)
+)
+
+
+# ============================================================
+# RODAPÉ
+# ============================================================
+
+ctk.CTkLabel(
+    principal,
+    text="Sistema OS  •  Controle de energia",
+    font=FONTE_PEQUENA,
+    text_color=CINZA_2
+).pack(
+    pady=0
+)
+
+
+# ============================================================
+# INICIAR
+# ============================================================
 
 janela.mainloop()
